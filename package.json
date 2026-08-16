@@ -25,9 +25,14 @@
 		"public-keys"
 	],
 	"scripts": {
+		"config:init": "node scripts/ensure-directory-config.mjs",
+		"prepare": "pnpm run config:init",
+		"predev": "pnpm run config:init",
 		"dev": "vite",
+		"prebuild": "pnpm run config:init",
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
+		"pretest": "pnpm run config:init",
 		"test": "node --experimental-strip-types scripts/check-key-directory.mjs && node scripts/check-ui-conventions.mjs",
 		"check": "pnpm run lint && pnpm run test && pnpm run cf-typegen:check && pnpm run build",
 		"preview": "pnpm run build && vite preview",

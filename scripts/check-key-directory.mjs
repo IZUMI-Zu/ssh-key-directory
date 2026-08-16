@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import directoryConfig from '../keys/directory.config.ts'
+import exampleDirectoryConfig from '../keys/directory.config.example.ts'
 import { createWorker } from '../worker/index.ts'
 import {
   buildDirectory,
@@ -183,6 +184,13 @@ await assert.rejects(
 )
 
 const configuredRegistry = await buildDirectoryRegistry(directoryConfig)
+const exampleRegistry = await buildDirectoryRegistry(exampleDirectoryConfig)
+assert.equal(exampleRegistry.identityCount, 2)
+assert.equal(exampleRegistry.groupCount, 1)
+assert.equal(exampleRegistry.keyCount, 2)
+assert.equal(findDirectory(exampleRegistry, 'demo')?.owner.handle, 'example')
+assert.equal(findGroup(exampleRegistry, 'ops')?.memberCount, 2)
+assert.equal(findGroup(exampleRegistry, 'ops')?.members[1].handle, 'teammate')
 assert.equal(configuredRegistry.identityCount, directoryConfig.identities.length)
 assert.equal(configuredRegistry.groupCount, directoryConfig.groups?.length ?? 0)
 assert.equal(
