@@ -2,6 +2,14 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
+[![CI](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml/badge.svg)](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-3f7446.svg)](./LICENSE)
+[![TypeScript 6](https://img.shields.io/badge/TypeScript-6-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React 19](https://img.shields.io/badge/React-19-149eca.svg?logo=react&logoColor=white)](https://react.dev/)
+[![UnoCSS 66](https://img.shields.io/badge/UnoCSS-66-333333.svg?logo=unocss&logoColor=white)](https://unocss.dev/)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/IZUMI-Zu/ssh-key-directory)
+
 一个以配置即代码方式管理的 Cloudflare Workers SSH 公钥目录。它无需数据库，即可提供类似 GitHub 的 `.keys` 端点、身份组、别名、JSON 元数据、指纹以及响应式查看界面。
 
 ## 目录
@@ -140,6 +148,8 @@ GET /api/v1/groups/ops?type=ssh-ed25519
 未知的公钥类型会返回 `400`；类型有效但目标身份没有对应公钥时会返回 `404`。
 
 ## 部署
+
+顶部的 **Deploy to Cloudflare** 按钮会把这个公开仓库导入你的 GitHub 账户、配置 Workers Builds 并部署 Worker。如果更喜欢使用本地 Wrangler 工作流，可以执行下面的命令。
 
 默认配置会部署到 Cloudflare 提供的 `workers.dev` 域名：
 

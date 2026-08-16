@@ -2,6 +2,14 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
+[![CI](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml/badge.svg)](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-3f7446.svg)](./LICENSE)
+[![TypeScript 6](https://img.shields.io/badge/TypeScript-6-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React 19](https://img.shields.io/badge/React-19-149eca.svg?logo=react&logoColor=white)](https://react.dev/)
+[![UnoCSS 66](https://img.shields.io/badge/UnoCSS-66-333333.svg?logo=unocss&logoColor=white)](https://unocss.dev/)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/IZUMI-Zu/ssh-key-directory)
+
 A config-as-code SSH public key directory for Cloudflare Workers. It provides GitHub-style `.keys` endpoints, identity groups, aliases, JSON metadata, fingerprints, and a responsive inspection UI without a database.
 
 ## Contents
@@ -140,6 +148,8 @@ GET /api/v1/groups/ops?type=ssh-ed25519
 An unknown key type returns `400`. A valid type that the requested identity does not have returns `404`.
 
 ## Deployment
+
+The **Deploy to Cloudflare** button at the top imports this public repository into your GitHub account, configures Workers Builds, and deploys the Worker. Use the commands below when you prefer a local Wrangler workflow.
 
 The default configuration deploys to a Cloudflare-provided `workers.dev` domain:
 
