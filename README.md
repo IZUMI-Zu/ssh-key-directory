@@ -2,16 +2,14 @@
 
 A config-as-code SSH public key directory for Cloudflare Workers. It provides GitHub-style `.keys` endpoints, identity groups, aliases, JSON metadata, fingerprints, and a responsive inspection UI without a database.
 
-这是一个运行在 Cloudflare Workers 上的多人员 SSH 公钥目录。网页给人查看，纯文本与 JSON 接口给 cloud-init、provisioning 脚本和审计工具使用。
+## Configure identities and keys
 
-## 配置人员和公钥
-
-所有公开数据都在 `keys/directory.config.ts` 中维护。一个人员包含规范名称、显示名称、可选别名和任意数量的公钥：
+All public directory data lives in `keys/directory.config.ts`. An identity has a canonical handle, a display name, optional aliases, and any number of public keys:
 
 ```ts
 {
   handle: 'example',
-  displayName: 'Example',
+  displayName: 'Example User',
   aliases: ['demo'],
   keys: [
     {
@@ -23,13 +21,13 @@ A config-as-code SSH public key directory for Cloudflare Workers. It provides Gi
 }
 ```
 
-新增一个人员只需在 `identities` 数组中增加一项。以下配置会同时提供 `/xx.keys`、`/x.keys` 和对应的 JSON/API 路由：
+To add another person, append an entry to the `identities` array. The following entry exposes `/teammate.keys`, `/tm.keys`, and the corresponding JSON and API routes:
 
 ```ts
 {
-  handle: 'xx',
-  displayName: 'XX',
-  aliases: ['x'],
+  handle: 'teammate',
+  displayName: 'Teammate',
+  aliases: ['tm'],
   keys: [
     {
       type: 'ecdsa-sk',
@@ -41,11 +39,11 @@ A config-as-code SSH public key directory for Cloudflare Workers. It provides Gi
 }
 ```
 
-`publicKey` 只填写 OpenSSH 公钥的 Base64 部分。不要提交私钥、私钥 stub、PIN、恢复码、`.key` 或 `.ppk` 文件。
+Set `publicKey` to only the Base64 portion of an OpenSSH public key. Never commit a private key, private-key stub, PIN, recovery code, `.key` file, or `.ppk` file.
 
-### Groups
+## Groups
 
-Groups 将多个人员的公钥合并为一个经过指纹去重的 `authorized_keys` 端点。组也支持别名，成员可以填写人员的规范名称或人员别名：
+Groups combine keys from multiple identities into one fingerprint-deduplicated `authorized_keys` endpoint. Groups may have aliases, and their members may reference either canonical identity handles or identity aliases:
 
 ```ts
 groups: [
@@ -53,12 +51,12 @@ groups: [
     handle: 'operators',
     displayName: 'Operators',
     aliases: ['ops'],
-    members: ['example', 'xx'],
+    members: ['example', 'teammate'],
   },
 ]
 ```
 
-以上配置会提供：
+This configuration exposes:
 
 ```text
 GET /groups/operators.keys
@@ -69,11 +67,11 @@ GET /api/v1/groups/operators
 GET /api/v1/groups/ops
 ```
 
-组端点同样支持可选的 `?type=` 参数，例如 `/groups/operators.keys?type=ecdsa-sk`。同一把公钥即使出现在多个成员中，也只会在组输出中出现一次。
+Group endpoints also accept the optional `?type=` query parameter, such as `/groups/operators.keys?type=ecdsa-sk`. When the same key belongs to more than one member, it appears only once in the group response.
 
-### Key type 缩写与别名
+## Key type aliases
 
-| 主缩写 | 类型别名 | 发布的 OpenSSH 类型 |
+| Canonical shorthand | Accepted aliases | Published OpenSSH type |
 | --- | --- | --- |
 | `ed25519` | `ed` | `ssh-ed25519` |
 | `ed25519-sk` | `sk-ed25519`, `ed-sk` | `sk-ssh-ed25519@openssh.com` |
@@ -84,11 +82,11 @@ GET /api/v1/groups/ops
 | `pq` | `mldsa44`, `ml-dsa` | `ssh-mldsa44-ed25519@openssh.com` |
 | `rsa` | `rsa-key` | `ssh-rsa` |
 
-主缩写、类型别名和完整 OpenSSH 类型都可以用于配置文件及 `?type=` 查询。名称不区分大小写。`options` 支持 `cert-authority`、`restrict`、`verify-required`、`no-touch-required` 等 authorized_keys 选项。
+Canonical shorthands, aliases, and complete OpenSSH type names are accepted in the configuration file and in `?type=` queries. Matching is case-insensitive. The `options` field accepts `authorized_keys` options such as `cert-authority`, `restrict`, `verify-required`, and `no-touch-required`.
 
-Worker 会检查人员名称和别名冲突、算法、Base64 SSH 数据头、重复指纹和 8 KiB 行长度限制，并计算标准 `SHA256:` 指纹。
+The Worker validates handle and alias collisions, algorithms, Base64 SSH data headers, duplicate fingerprints, and the 8 KiB line-length limit. It also calculates standard `SHA256:` fingerprints.
 
-## 本地验证
+## Local development
 
 ```bash
 pnpm install
@@ -96,9 +94,9 @@ pnpm run check
 pnpm run dev
 ```
 
-`pnpm run test` 会同时执行 Worker 路由测试和可自动化的 Antfu UI pre-flight 检查。响应式布局、深色模式和视觉层级仍需要浏览器验收。
+`pnpm run test` runs the Worker route tests and the automated Antfu UI preflight. Responsive layout, dark mode, and visual hierarchy should still be checked in a browser.
 
-常用接口：
+Common endpoints:
 
 ```text
 GET /example.keys
@@ -115,9 +113,9 @@ GET /fingerprints.json
 GET /healthz
 ```
 
-`/api/v1/directory` 返回全部人员及其公钥。规范名称与别名会解析到同一份目录。响应包含 CORS、ETag 与缓存重验证头。
+`/api/v1/directory` returns all identities and their keys. Canonical handles and aliases resolve to the same directory entry. Responses include CORS, ETag, and cache-revalidation headers.
 
-通过 `type` 查询参数只获取一种公钥。身份别名和类型别名可以组合：
+Use the `type` query parameter to request one key type. Identity aliases and key type aliases can be combined:
 
 ```text
 GET /example.keys?type=ed25519
@@ -128,32 +126,32 @@ GET /groups/operators.keys?type=ed
 GET /api/v1/groups/ops?type=ssh-ed25519
 ```
 
-类型名称无效时返回 `400`；类型有效但该人员没有对应公钥时返回 `404`。
+An unknown key type returns `400`. A valid type that the requested identity does not have returns `404`.
 
-## 部署
+## Deployment
 
-默认配置会部署到 Cloudflare 提供的 `workers.dev` 域名：
+The default configuration deploys to a Cloudflare-provided `workers.dev` domain:
 
 ```bash
 pnpm exec wrangler login
 pnpm run deploy
 ```
 
-需要 Custom Domain 时，复制模板为被 Git 忽略的本地配置，再修改域名：
+For a Custom Domain, copy the example to the Git-ignored local configuration and edit its domain:
 
 ```powershell
 Copy-Item wrangler.custom.example.jsonc wrangler.local.jsonc
 ```
 
-然后执行：
+Then deploy with:
 
 ```bash
 pnpm run deploy:custom
 ```
 
-发布前可以用 `pnpm run deploy:custom:dry-run` 检查本地配置，而不真正上线。Custom Domain 必须位于当前 Cloudflare 账户的有效 zone 中，并且不能已有冲突记录。提交开源仓库时不要提交个人的 `wrangler.local.jsonc`。
+Run `pnpm run deploy:custom:dry-run` to validate the local configuration without publishing it. The Custom Domain must belong to an active zone in the current Cloudflare account and must not conflict with an existing record. Do not commit your personal `wrangler.local.jsonc` when publishing a fork.
 
-服务器初始化示例：
+Example server bootstrap:
 
 ```bash
 install -d -m 700 -o ubuntu -g ubuntu /home/ubuntu/.ssh
@@ -163,10 +161,10 @@ chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
 chmod 600 /home/ubuntu/.ssh/authorized_keys
 ```
 
-公钥目录适合在部署或受控同步时写入本地 `authorized_keys`。不要把远程 HTTP 服务放进每次 SSH 登录的实时认证链路。
+Use the directory to write a local `authorized_keys` file during deployment or controlled synchronization. Do not place a remote HTTP service in the live authentication path of every SSH login.
 
-网页使用 UnoCSS、Phosphor Icons、DM Sans 与 DM Mono 构建。字体文件随产物发布，不依赖运行时字体 CDN。
+The web interface uses UnoCSS, Phosphor Icons, DM Sans, and DM Mono. Font files ship with the build and do not require a runtime font CDN.
 
-## 开源维护
+## Open-source maintenance
 
-项目使用 MIT License。安全问题请遵循 `SECURITY.md` 私下报告；贡献流程见 `CONTRIBUTING.md`。GitHub Actions 会执行 lint、Worker 路由测试、Antfu UI pre-flight、Wrangler 类型检查、生产构建和部署 dry run。
+The project uses the MIT License. Follow `SECURITY.md` to report security issues privately and see `CONTRIBUTING.md` for the contribution workflow. GitHub Actions runs linting, Worker route tests, the Antfu UI preflight, Wrangler type checks, a production build, and a deployment dry run.
