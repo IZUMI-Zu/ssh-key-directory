@@ -185,7 +185,7 @@ wrangler.jsonc         默认 workers.dev 部署配置
 
 ```bash
 pnpm run check
-pnpm exec wrangler login
+pnpm run cloudflare:login
 pnpm run deploy:dry-run
 pnpm run deploy
 ```
@@ -209,11 +209,12 @@ pnpm run deploy:custom
 服务器初始化示例：
 
 ```bash
+temp_keys="$(mktemp)"
+trap 'rm -f "$temp_keys"' EXIT
+
+curl -fsSL https://keys.example.com/example.keys -o "$temp_keys"
 install -d -m 700 -o ubuntu -g ubuntu /home/ubuntu/.ssh
-curl -fsSL https://keys.example.com/example.keys \
-  -o /home/ubuntu/.ssh/authorized_keys
-chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
-chmod 600 /home/ubuntu/.ssh/authorized_keys
+install -m 600 -o ubuntu -g ubuntu "$temp_keys" /home/ubuntu/.ssh/authorized_keys
 ```
 
 公钥目录适合在部署或受控同步时写入本地 `authorized_keys`。不要把远程 HTTP 服务放进每次 SSH 登录的实时认证链路。
@@ -222,4 +223,4 @@ chmod 600 /home/ubuntu/.ssh/authorized_keys
 
 ## 开源维护
 
-项目使用 MIT License。安全问题请按照 `SECURITY.md` 私下报告；贡献流程见 `CONTRIBUTING.md`。GitHub Actions 会执行 lint、Worker 路由测试、Antfu UI 预检、Wrangler 类型检查、生产构建和部署 dry run。
+项目使用 MIT License。安全问题请按照 `SECURITY.md` 私下报告；贡献流程见 `CONTRIBUTING.md`。GitHub Actions 会执行 lint、Worker 路由测试、Antfu UI 预检、已追踪文件隐私与文档检查、Wrangler 类型检查、生产构建和部署 dry run。

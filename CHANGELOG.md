@@ -14,3 +14,4 @@ The format is based on Keep a Changelog, and the project follows Semantic Versio
 - Key-type abbreviations, aliases, and optional type filtering.
 - Responsive light and dark interface built with UnoCSS.
 - Worker route tests and automated Antfu UI pre-flight checks.
+- Tracked-file privacy checks for private keys, credentials, personal email addresses, and local profile paths.

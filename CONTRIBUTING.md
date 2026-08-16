@@ -6,7 +6,7 @@ Thanks for helping improve SSH Key Directory.
 
 Requirements:
 
-- Node.js 22.6 or newer
+- Node.js 22.13 or newer
 - pnpm 10 or newer
 
 Install dependencies and run the local Worker:
@@ -22,6 +22,8 @@ Run the full verification suite before opening a pull request:
 pnpm run check
 pnpm run deploy:dry-run
 ```
+
+`pnpm run test` includes a tracked-file privacy audit. Review the complete Git diff too, because automated secret patterns cannot determine whether every name, hostname, or public key was intended for publication.
 
 ## Configuration changes
 

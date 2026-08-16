@@ -14,7 +14,7 @@ Only public SSH keys belong in either file. Never add private keys, security-key
 ## Prerequisites
 
 - A Cloudflare account
-- Node.js 22.6 or newer and pnpm 10 or newer for the local workflow
+- Node.js 22.13 or newer and pnpm 10 or newer for the local workflow
 - A Cloudflare-managed DNS zone only if you want a Custom Domain
 - A public GitHub or GitLab repository if you use the Deploy to Cloudflare button
 
@@ -55,7 +55,7 @@ Validate and deploy:
 
 ```bash
 pnpm run check
-pnpm exec wrangler login
+pnpm run cloudflare:login
 pnpm run deploy:dry-run
 pnpm run deploy
 ```
@@ -65,7 +65,7 @@ pnpm run deploy
 Check the authenticated account at any time with:
 
 ```bash
-pnpm exec wrangler whoami
+pnpm run cloudflare:whoami
 ```
 
 ## Add a Custom Domain
@@ -165,7 +165,7 @@ Replace the user, group, and endpoint for your server. Prefer a group endpoint w
 Inspect live logs or roll back a bad deployment with:
 
 ```bash
-pnpm exec wrangler tail
-pnpm exec wrangler versions list
-pnpm exec wrangler rollback
+pnpm run cloudflare:tail
+pnpm run cloudflare:versions
+pnpm run cloudflare:rollback
 ```

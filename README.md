@@ -185,7 +185,7 @@ For a local Wrangler deployment, edit the ignored `keys/directory.config.ts`, th
 
 ```bash
 pnpm run check
-pnpm exec wrangler login
+pnpm run cloudflare:login
 pnpm run deploy:dry-run
 pnpm run deploy
 ```
@@ -209,11 +209,12 @@ After adding or rotating a key, run the checks and deploy again. Git-based deplo
 Example server bootstrap:
 
 ```bash
+temp_keys="$(mktemp)"
+trap 'rm -f "$temp_keys"' EXIT
+
+curl -fsSL https://keys.example.com/example.keys -o "$temp_keys"
 install -d -m 700 -o ubuntu -g ubuntu /home/ubuntu/.ssh
-curl -fsSL https://keys.example.com/example.keys \
-  -o /home/ubuntu/.ssh/authorized_keys
-chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
-chmod 600 /home/ubuntu/.ssh/authorized_keys
+install -m 600 -o ubuntu -g ubuntu "$temp_keys" /home/ubuntu/.ssh/authorized_keys
 ```
 
 Use the directory to write a local `authorized_keys` file during deployment or controlled synchronization. Do not place a remote HTTP service in the live authentication path of every SSH login.
@@ -222,4 +223,4 @@ The web interface uses UnoCSS, Phosphor Icons, DM Sans, and DM Mono. Font files 
 
 ## Open-source maintenance
 
-The project uses the MIT License. Follow `SECURITY.md` to report security issues privately and see `CONTRIBUTING.md` for the contribution workflow. GitHub Actions runs linting, Worker route tests, the Antfu UI preflight, Wrangler type checks, a production build, and a deployment dry run.
+The project uses the MIT License. Follow `SECURITY.md` to report security issues privately and see `CONTRIBUTING.md` for the contribution workflow. GitHub Actions runs linting, Worker route tests, the Antfu UI preflight, tracked-file privacy and documentation checks, Wrangler type checks, a production build, and a deployment dry run.

@@ -14,7 +14,7 @@ SSH Key Directory 支持两种部署方式，它们都会发布同一个 Worker 
 ## 准备条件
 
 - Cloudflare 账户
-- 本地部署需要 Node.js 22.6 或更高版本以及 pnpm 10 或更高版本
+- 本地部署需要 Node.js 22.13 或更高版本以及 pnpm 10 或更高版本
 - 只有使用 Custom Domain 时才需要由 Cloudflare 管理的 DNS zone
 - 使用 Deploy to Cloudflare 按钮时需要公开的 GitHub 或 GitLab 仓库
 
@@ -55,7 +55,7 @@ pnpm run config:init
 
 ```bash
 pnpm run check
-pnpm exec wrangler login
+pnpm run cloudflare:login
 pnpm run deploy:dry-run
 pnpm run deploy
 ```
@@ -65,7 +65,7 @@ pnpm run deploy
 随时可以用下面的命令确认当前登录账户：
 
 ```bash
-pnpm exec wrangler whoami
+pnpm run cloudflare:whoami
 ```
 
 ## 添加 Custom Domain
@@ -165,7 +165,7 @@ install -m 600 -o ubuntu -g ubuntu "$temp_keys" /home/ubuntu/.ssh/authorized_key
 使用以下命令查看实时日志或回滚错误部署：
 
 ```bash
-pnpm exec wrangler tail
-pnpm exec wrangler versions list
-pnpm exec wrangler rollback
+pnpm run cloudflare:tail
+pnpm run cloudflare:versions
+pnpm run cloudflare:rollback
 ```
