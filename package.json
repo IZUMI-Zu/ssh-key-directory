@@ -38,7 +38,7 @@
 		"preview": "pnpm run build && vite preview",
 		"deploy": "pnpm run build && wrangler deploy",
 		"deploy:custom": "pnpm run build && wrangler deploy --config wrangler.local.jsonc",
-		"deploy:dry-run": "wrangler deploy --dry-run",
+		"deploy:dry-run": "pnpm run build && wrangler deploy --dry-run",
 		"deploy:custom:dry-run": "pnpm run build && wrangler deploy --dry-run --config wrangler.local.jsonc",
 		"cf-typegen": "wrangler types",
 		"cf-typegen:check": "wrangler types --check"

@@ -1,5 +1,7 @@
 # SSH Key Directory
 
+<img src="./public/favicon.svg" align="right" width="72" height="72" alt="SSH Key Directory logo">
+
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
 [![CI](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml/badge.svg)](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml)
@@ -18,12 +20,22 @@ A config-as-code SSH public key directory for Cloudflare Workers. It provides Gi
 - [Groups](#groups)
 - [Key type aliases](#key-type-aliases)
 - [Local development](#local-development)
+- [Project structure](#project-structure)
 - [Deployment](#deployment)
 - [Open-source maintenance](#open-source-maintenance)
 
 ## Configure identities and keys
 
 Deployment-specific directory data lives in the Git-ignored `keys/directory.config.ts`. The repository tracks a [complete example configuration](./keys/directory.config.example.ts) with two identities, aliases, restricted key options, and a group. `pnpm install`, `pnpm run dev`, and `pnpm run build` create the local file from that example only when it does not already exist, so an existing personal configuration is never overwritten.
+
+Choose the file according to how the project is deployed:
+
+| Deployment workflow | File to edit |
+| --- | --- |
+| Local Wrangler deployment | `keys/directory.config.ts` |
+| Deploy to Cloudflare or Workers Builds | `keys/directory.config.example.ts` in your deployment fork |
+
+Cloud builds use a clean Git checkout and therefore cannot read the ignored local file. The tracked example becomes the build input for Git-based deployments.
 
 Keep a personal configuration untracked in a public checkout, or deliberately version it in a private deployment fork. An identity has a canonical handle, a display name, optional aliases, and any number of public keys:
 
@@ -149,18 +161,36 @@ GET /api/v1/groups/ops?type=ssh-ed25519
 
 An unknown key type returns `400`. A valid type that the requested identity does not have returns `404`.
 
+## Project structure
+
+```text
+keys/                  Example and local directory configuration
+src/components/        Responsive React page sections and controls
+src/directory.ts       Browser-side API response types and guards
+worker/                Worker router, validation, and key serialization
+docs/                  English and Chinese deployment tutorials
+scripts/               Configuration, UI, key, and documentation checks
+wrangler.jsonc         Default workers.dev deployment
+```
+
+`src/App.tsx` only coordinates data loading, selection, theme state, and the extracted page sections.
+
 ## Deployment
 
-The **Deploy to Cloudflare** button at the top imports this public repository into your GitHub account, configures Workers Builds, and deploys the Worker. Use the commands below when you prefer a local Wrangler workflow.
+See the [complete deployment guide](./docs/deployment.md) for Deploy to Cloudflare, local Wrangler, Custom Domains, key rotation, server installation, and troubleshooting.
 
-The default configuration deploys to a Cloudflare-provided `workers.dev` domain:
+The **Deploy to Cloudflare** button at the top clones this public repository, configures Workers Builds, and deploys it. The first deployment uses the safe example directory. Edit and push `keys/directory.config.example.ts` in the generated deployment fork to publish your own public keys.
+
+For a local Wrangler deployment, edit the ignored `keys/directory.config.ts`, then run:
 
 ```bash
+pnpm run check
 pnpm exec wrangler login
+pnpm run deploy:dry-run
 pnpm run deploy
 ```
 
-For a Custom Domain, copy the example to the Git-ignored local configuration and edit its domain:
+The default configuration deploys to a Cloudflare-provided `workers.dev` domain. For a Custom Domain, copy the example to the ignored local configuration and edit its exact hostname:
 
 ```powershell
 Copy-Item wrangler.custom.example.jsonc wrangler.local.jsonc
@@ -173,6 +203,8 @@ pnpm run deploy:custom
 ```
 
 Run `pnpm run deploy:custom:dry-run` to validate the local configuration without publishing it. The Custom Domain must belong to an active zone in the current Cloudflare account and must not conflict with an existing record. Do not commit your personal `wrangler.local.jsonc` when publishing a fork.
+
+After adding or rotating a key, run the checks and deploy again. Git-based deployments instead require updating and pushing the tracked example in the deployment fork. The [deployment guide](./docs/deployment.md#add-or-rotate-keys-after-deployment) explains both update paths.
 
 Example server bootstrap:
 

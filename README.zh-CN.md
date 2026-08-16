@@ -1,5 +1,7 @@
 # SSH Key Directory
 
+<img src="./public/favicon.svg" align="right" width="72" height="72" alt="SSH Key Directory 图标">
+
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
 [![CI](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml/badge.svg)](https://github.com/IZUMI-Zu/ssh-key-directory/actions/workflows/ci.yml)
@@ -18,12 +20,22 @@
 - [身份组](#身份组)
 - [公钥类型别名](#公钥类型别名)
 - [本地开发](#本地开发)
+- [项目结构](#项目结构)
 - [部署](#部署)
 - [开源维护](#开源维护)
 
 ## 配置身份与公钥
 
 部署专用的目录数据保存在已被 Git 忽略的 `keys/directory.config.ts`。仓库会追踪一份[完整示例配置](./keys/directory.config.example.ts)，其中包含两个身份、别名、受限公钥选项和身份组。`pnpm install`、`pnpm run dev` 与 `pnpm run build` 只会在本地配置不存在时从示例生成该文件，因此不会覆盖已有的个人配置。
+
+根据部署方式选择要修改的文件：
+
+| 部署方式 | 需要修改的文件 |
+| --- | --- |
+| 本地 Wrangler 部署 | `keys/directory.config.ts` |
+| Deploy to Cloudflare 或 Workers Builds | 部署 fork 中的 `keys/directory.config.example.ts` |
+
+云端构建使用干净的 Git checkout，无法读取被忽略的本地文件，因此 Git 自动部署会把被追踪的示例作为构建输入。
 
 在公开 checkout 中应让个人配置保持未追踪状态；如果需要配置即代码，可以在私有部署 fork 中有意追踪它。一个身份包含规范名称、显示名称、可选别名和任意数量的公钥：
 
@@ -149,18 +161,36 @@ GET /api/v1/groups/ops?type=ssh-ed25519
 
 未知的公钥类型会返回 `400`；类型有效但目标身份没有对应公钥时会返回 `404`。
 
+## 项目结构
+
+```text
+keys/                  完整示例与本地目录配置
+src/components/        响应式 React 页面区块和控件
+src/directory.ts       浏览器端 API 响应类型与校验
+worker/                Worker 路由、校验与公钥序列化
+docs/                  中英文部署教程
+scripts/               配置、UI、公钥和文档检查
+wrangler.jsonc         默认 workers.dev 部署配置
+```
+
+`src/App.tsx` 只负责数据加载、身份选择、主题状态以及组合已经拆分的页面区块。
+
 ## 部署
 
-顶部的 **Deploy to Cloudflare** 按钮会把这个公开仓库导入你的 GitHub 账户、配置 Workers Builds 并部署 Worker。如果更喜欢使用本地 Wrangler 工作流，可以执行下面的命令。
+完整步骤见[中文部署教程](./docs/deployment.zh-CN.md)，其中包含 Deploy to Cloudflare、本地 Wrangler、Custom Domain、公钥轮换、服务器安装和常见问题。
 
-默认配置会部署到 Cloudflare 提供的 `workers.dev` 域名：
+顶部的 **Deploy to Cloudflare** 按钮会克隆公开仓库、配置 Workers Builds 并完成部署。第一次部署会使用安全的示例目录；在生成的部署 fork 中修改并推送 `keys/directory.config.example.ts`，即可发布自己的公钥。
+
+本地 Wrangler 部署需要先修改被忽略的 `keys/directory.config.ts`，然后执行：
 
 ```bash
+pnpm run check
 pnpm exec wrangler login
+pnpm run deploy:dry-run
 pnpm run deploy
 ```
 
-需要 Custom Domain 时，将示例复制为已被 Git 忽略的本地配置，然后修改域名：
+默认配置会部署到 Cloudflare 提供的 `workers.dev` 域名。需要 Custom Domain 时，将示例复制为已被 Git 忽略的本地配置，然后修改准确的主机名：
 
 ```powershell
 Copy-Item wrangler.custom.example.jsonc wrangler.local.jsonc
@@ -173,6 +203,8 @@ pnpm run deploy:custom
 ```
 
 发布前可运行 `pnpm run deploy:custom:dry-run` 检查本地配置而不真正上线。Custom Domain 必须位于当前 Cloudflare 账户的有效 zone 中，并且不能与已有记录冲突。发布 fork 时不要提交个人的 `wrangler.local.jsonc`。
+
+新增或轮换公钥后，需要重新检查和部署。Git 自动部署则要修改并推送部署 fork 中被追踪的示例，具体见[部署后的公钥更新流程](./docs/deployment.zh-CN.md#部署后新增或轮换公钥)。
 
 服务器初始化示例：
 

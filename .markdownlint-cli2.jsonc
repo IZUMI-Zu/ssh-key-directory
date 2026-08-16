@@ -1,0 +1,15 @@
+{
+  "config": {
+    "MD013": false,
+    "MD033": {
+      "allowed_elements": ["img"]
+    }
+  },
+  "globs": [
+    "README*.md",
+    "docs/**/*.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
+  ]
+}
