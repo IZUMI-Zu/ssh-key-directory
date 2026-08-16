@@ -396,13 +396,14 @@ function App() {
               <aside className="surface-panel h-fit overflow-hidden" aria-label="Identity selector">
                 {registry.identities.map((identity) => {
                   const selected = identity.owner.handle === directory.owner.handle
+                  const currentIdentity = selected ? { 'aria-current': 'true' as const } : {}
                   return (
                     <button
                       className={`surface-row grid min-h-18 w-full grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition-[color,background-color] duration-150 ${selected ? 'bg-active color-active' : 'bg-elevated color-base hover:bg-secondary'}`}
                       key={identity.owner.handle}
                       type="button"
                       onClick={() => setSelectedHandle(identity.owner.handle)}
-                      aria-pressed={selected}
+                      {...currentIdentity}
                     >
                       <span className="grid size-10 place-items-center rounded-lg border border-strong bg-secondary">
                         <span className="i-ph-user-duotone text-base" aria-hidden="true" />
