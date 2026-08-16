@@ -67,7 +67,7 @@ assert.match(favicon, /prefers-color-scheme:\s*dark/, 'The favicon must support 
 assert.match(favicon, /class="mark"/, 'The favicon must include its semantic key mark')
 assert.match(favicon, /class="base"/, 'The favicon must use a solid brand tile')
 assert.doesNotMatch(favicon, /#863bff/i, 'The default starter favicon must not ship')
-assert.doesNotMatch(html, /Example|keys\.example\.dev/, 'Public metadata must not hardcode one deployment')
+assert.doesNotMatch(html, /https?:\/\/|\bkeys\.[a-z0-9.-]+/i, 'Public metadata must not hardcode one deployment')
 
 const forbiddenPatterns = [
   { pattern: /[—–]/u, message: 'Visible copy must not contain em-dash or en-dash characters' },

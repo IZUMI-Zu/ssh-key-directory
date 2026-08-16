@@ -31,3 +31,14 @@ keys/directory.config.ts
 !.dev.vars.example
 .env*
 !.env.example
+
+# Common private-key exports. Public `.pub` files remain allowed.
+*.key
+*.pem
+*.ppk
+id_dsa
+id_ecdsa
+id_ecdsa_sk
+id_ed25519
+id_ed25519_sk
+id_rsa

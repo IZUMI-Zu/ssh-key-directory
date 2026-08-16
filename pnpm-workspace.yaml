@@ -1,5 +1,5 @@
-# Pre-approve build scripts for the packages C3 itself installs that need
-# them: `workerd` downloads the platform binary and `esbuild` downloads/
+# Pre-approve build scripts for Cloudflare and Vite dependencies that need
+# them: `workerd` downloads the platform binary and `esbuild` downloads or
 # builds native bindings. Without these, pnpm 11+ aborts the install with
 # ERR_PNPM_IGNORED_BUILDS.
 allowBuilds:

@@ -61,15 +61,15 @@ assert.equal(findSupportedKeyType('not-a-key-type'), undefined)
 const testConfig = {
   identities: [
     {
-      handle: 'example',
-      displayName: 'Example',
-      aliases: ['demo'],
+      handle: 'primary',
+      displayName: 'Primary User',
+      aliases: ['main'],
       keys,
     },
     {
-      handle: 'xx',
-      displayName: 'XX',
-      aliases: ['x'],
+      handle: 'secondary',
+      displayName: 'Secondary User',
+      aliases: ['backup'],
       keys: [keys[0]],
     },
   ],
@@ -78,7 +78,7 @@ const testConfig = {
       handle: 'operators',
       displayName: 'Operators',
       aliases: ['ops'],
-      members: ['demo', 'x'],
+      members: ['main', 'backup'],
     },
   ],
 }
@@ -88,8 +88,8 @@ assert.equal(registry.configured, true)
 assert.equal(registry.identityCount, 2)
 assert.equal(registry.groupCount, 1)
 assert.equal(registry.keyCount, SUPPORTED_KEY_TYPES.length + 1)
-assert.equal(findDirectory(registry, 'demo')?.owner.handle, 'example')
-assert.equal(findDirectory(registry, 'x')?.owner.handle, 'xx')
+assert.equal(findDirectory(registry, 'main')?.owner.handle, 'primary')
+assert.equal(findDirectory(registry, 'backup')?.owner.handle, 'secondary')
 assert.equal(findDirectory(registry, 'missing'), undefined)
 
 const operators = findGroup(registry, 'ops')
@@ -97,10 +97,10 @@ assert.ok(operators)
 assert.equal(operators.group.handle, 'operators')
 assert.equal(operators.memberCount, 2)
 assert.equal(operators.count, SUPPORTED_KEY_TYPES.length)
-assert.deepEqual(operators.members.map((member) => member.handle), ['example', 'xx'])
+assert.deepEqual(operators.members.map((member) => member.handle), ['primary', 'secondary'])
 assert.equal(findGroup(registry, 'missing'), undefined)
 
-const directory = findDirectory(registry, 'example')
+const directory = findDirectory(registry, 'primary')
 assert.ok(directory)
 assert.equal(directory.count, SUPPORTED_KEY_TYPES.length)
 assert.deepEqual(directory.supportedTypes, SUPPORTED_KEY_TYPES)
@@ -130,8 +130,8 @@ assert.equal(emptyDirectory.count, 0)
 
 await assert.rejects(
   () => buildDirectory({
-    handle: 'example',
-    displayName: 'Example',
+    handle: 'primary',
+    displayName: 'Primary User',
     keys: [keys[0], keys[0]],
   }),
   (error) => error instanceof InvalidKeySourceError && /duplicate public key/i.test(error.message),
@@ -229,21 +229,21 @@ assert.deepEqual(directoryIndex.supportedTypes[0].aliases, ['ed'])
 assert.equal(directoryIndex.groupCount, 1)
 assert.equal(directoryIndex.groups[0].endpoints.authorizedKeys, 'https://keys.example.com/groups/operators.keys')
 
-const filteredKeyResponse = await workerRequest('/example.keys?type=ed')
+const filteredKeyResponse = await workerRequest('/primary.keys?type=ed')
 assert.equal(filteredKeyResponse.status, 200)
 assert.equal(filteredKeyResponse.headers.get('X-Key-Type'), 'ed25519')
 assert.match(await filteredKeyResponse.text(), /^ssh-ed25519 /)
 
-const filteredAliasResponse = await workerRequest('/demo.keys?type=ssh-ed25519')
+const filteredAliasResponse = await workerRequest('/main.keys?type=ssh-ed25519')
 assert.equal(filteredAliasResponse.status, 200)
 assert.match(await filteredAliasResponse.text(), /^ssh-ed25519 /)
 
-const filteredJsonResponse = await workerRequest('/api/v1/identities/demo?type=ED')
+const filteredJsonResponse = await workerRequest('/api/v1/identities/main?type=ED')
 assert.equal(filteredJsonResponse.status, 200)
 const filteredJson = await filteredJsonResponse.json()
-assert.equal(filteredJson.owner.handle, 'example')
+assert.equal(filteredJson.owner.handle, 'primary')
 assert.equal(filteredJson.count, 1)
-assert.equal(filteredJson.endpoints.authorizedKeys, 'https://keys.example.com/example.keys?type=ed25519')
+assert.equal(filteredJson.endpoints.authorizedKeys, 'https://keys.example.com/primary.keys?type=ed25519')
 
 const groupKeyResponse = await workerRequest('/groups/ops.keys?type=ed')
 assert.equal(groupKeyResponse.status, 200)
@@ -265,10 +265,10 @@ const groupsIndex = await groupsResponse.json()
 assert.equal(groupsIndex.groupCount, 1)
 assert.equal(groupsIndex.groups[0].group.aliases[0], 'ops')
 
-assert.equal((await workerRequest('/xx.keys?type=ecdsa-sk')).status, 404)
+assert.equal((await workerRequest('/secondary.keys?type=ecdsa-sk')).status, 404)
 assert.equal((await workerRequest('/groups/operators.keys?type=unknown')).status, 400)
 assert.equal((await workerRequest('/groups/missing.keys')).status, 404)
-assert.equal((await workerRequest('/example.keys?type=unknown')).status, 400)
-assert.equal((await workerRequest('/example.keys?type=ed&type=rsa')).status, 400)
+assert.equal((await workerRequest('/primary.keys?type=unknown')).status, 400)
+assert.equal((await workerRequest('/primary.keys?type=ed&type=rsa')).status, 400)
 
 console.log('key-directory: all checks passed')

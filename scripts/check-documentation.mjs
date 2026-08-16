@@ -23,7 +23,7 @@ assert.match(english, /docs\/deployment\.md/, 'English README must link the depl
 assert.match(chinese, /docs\/deployment\.zh-CN\.md/, 'Chinese README must link the deployment guide')
 
 for (const document of [english, chinese, deploymentEnglish, deploymentChinese]) {
-  assert.doesNotMatch(document, /\/(?:example|demo)\.(?:keys|json)|keys\.example\.dev/i, 'README examples must not contain deployment-specific routes')
+  assert.doesNotMatch(document, /https:\/\/keys\.(?!example\.com)/i, 'Key-directory examples must use keys.example.com')
   assert.doesNotMatch(document, /[—–]/u, 'Documentation must not contain em-dash or en-dash characters')
 }
 
@@ -35,7 +35,6 @@ for (const [document, language] of [[deploymentEnglish, 'English'], [deploymentC
   assert.match(document, /curl -fsSL/, `${language} deployment guide must include endpoint verification`)
   assert.match(document, /authorized_keys/, `${language} deployment guide must include safe server installation`)
 }
-assert.doesNotMatch(exampleConfig, /\b(?:example|demo|example)\b/i, 'Example config must not contain deployment-specific names')
 assert.doesNotMatch(exampleConfig, /[—–]/u, 'Example config comments must not contain em-dash or en-dash characters')
 
 for (const expected of ["handle: 'example'", "aliases: ['demo']", 'groups:', "members: ['example', 'team']"]) {
