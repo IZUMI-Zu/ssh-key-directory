@@ -4,6 +4,7 @@ import {
   presetWind4,
   transformerVariantGroup,
 } from 'unocss'
+import { icons as phosphorIcons } from '@iconify-json/ph'
 
 export default defineConfig({
   theme: {
@@ -19,6 +20,9 @@ export default defineConfig({
       },
     }),
     presetIcons({
+      collections: {
+        ph: phosphorIcons,
+      },
       scale: 1.05,
       extraProperties: {
         display: 'inline-block',
