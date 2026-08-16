@@ -5,3 +5,7 @@
 allowBuilds:
   esbuild: true
   workerd: true
+
+# Delay new releases for seven days and reject weakened package provenance.
+minimumReleaseAge: 10080
+trustPolicy: no-downgrade
