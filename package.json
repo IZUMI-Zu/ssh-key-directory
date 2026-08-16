@@ -33,7 +33,7 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"pretest": "pnpm run config:init",
-		"test": "node --experimental-strip-types scripts/check-key-directory.mjs && node scripts/check-ui-conventions.mjs",
+		"test": "node --experimental-strip-types scripts/check-key-directory.mjs && node scripts/check-ui-conventions.mjs && node scripts/check-documentation.mjs",
 		"check": "pnpm run lint && pnpm run test && pnpm run cf-typegen:check && pnpm run build",
 		"preview": "pnpm run build && vite preview",
 		"deploy": "pnpm run build && wrangler deploy",

@@ -23,7 +23,9 @@
 
 ## 配置身份与公钥
 
-所有公开目录数据都在 `keys/directory.config.ts` 中维护。一个身份包含规范名称、显示名称、可选别名和任意数量的公钥：
+部署专用的目录数据保存在已被 Git 忽略的 `keys/directory.config.ts`。仓库会追踪一份[完整示例配置](./keys/directory.config.example.ts)，其中包含两个身份、别名、受限公钥选项和身份组。`pnpm install`、`pnpm run dev` 与 `pnpm run build` 只会在本地配置不存在时从示例生成该文件，因此不会覆盖已有的个人配置。
+
+在公开 checkout 中应让个人配置保持未追踪状态；如果需要配置即代码，可以在私有部署 fork 中有意追踪它。一个身份包含规范名称、显示名称、可选别名和任意数量的公钥：
 
 ```ts
 {
@@ -58,7 +60,7 @@
 }
 ```
 
-`publicKey` 只填写 OpenSSH 公钥的 Base64 部分。不要提交私钥、私钥 stub、PIN、恢复码、`.key` 或 `.ppk` 文件。
+`publicKey` 只填写 OpenSSH 公钥的 Base64 部分。公钥本身不是秘密，但把部署身份与可复用的上游仓库分开，可以避免 fork 意外部署他人的访问列表。不要提交私钥、私钥 stub、PIN、恢复码、`.key` 或 `.ppk` 文件。
 
 ## 身份组
 

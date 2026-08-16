@@ -23,7 +23,9 @@ A config-as-code SSH public key directory for Cloudflare Workers. It provides Gi
 
 ## Configure identities and keys
 
-All public directory data lives in `keys/directory.config.ts`. An identity has a canonical handle, a display name, optional aliases, and any number of public keys:
+Deployment-specific directory data lives in the Git-ignored `keys/directory.config.ts`. The repository tracks a [complete example configuration](./keys/directory.config.example.ts) with two identities, aliases, restricted key options, and a group. `pnpm install`, `pnpm run dev`, and `pnpm run build` create the local file from that example only when it does not already exist, so an existing personal configuration is never overwritten.
+
+Keep a personal configuration untracked in a public checkout, or deliberately version it in a private deployment fork. An identity has a canonical handle, a display name, optional aliases, and any number of public keys:
 
 ```ts
 {
@@ -58,7 +60,7 @@ To add another person, append an entry to the `identities` array. The following 
 }
 ```
 
-Set `publicKey` to only the Base64 portion of an OpenSSH public key. Never commit a private key, private-key stub, PIN, recovery code, `.key` file, or `.ppk` file.
+Set `publicKey` to only the Base64 portion of an OpenSSH public key. Public keys are not secrets, but keeping deployment identities outside the reusable upstream repository prevents forks from accidentally deploying someone else's access list. Never commit a private key, private-key stub, PIN, recovery code, `.key` file, or `.ppk` file.
 
 ## Groups
 
