@@ -4,6 +4,14 @@
 	"version": "0.1.0",
 	"description": "A config-as-code SSH public key directory for Cloudflare Workers.",
 	"license": "MIT",
+	"homepage": "https://github.com/IZUMI-Zu/ssh-key-directory#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/IZUMI-Zu/ssh-key-directory.git"
+	},
+	"bugs": {
+		"url": "https://github.com/IZUMI-Zu/ssh-key-directory/issues"
+	},
 	"type": "module",
 	"packageManager": "pnpm@10.33.0",
 	"engines": {
