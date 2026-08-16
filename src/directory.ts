@@ -17,7 +17,6 @@ export interface PublicKeyRecord {
   touchRequired: boolean
   verificationRequired: boolean
 }
-
 export interface DirectoryResponse {
   owner: {
     handle: string
@@ -93,4 +92,3 @@ export function legacyToIndex(directory: DirectoryResponse): DirectoryIndexRespo
     supportedTypes: directory.supportedTypes,
   }
 }
-

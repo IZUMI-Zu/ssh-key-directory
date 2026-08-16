@@ -12,4 +12,3 @@ export function KeyIcon({ keyRecord }: { keyRecord: PublicKeyRecord }) {
   }
   return <span className="i-ph-key-duotone text-lg color-secondary" aria-hidden="true" />
 }
-
