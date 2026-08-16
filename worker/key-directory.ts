@@ -348,12 +348,13 @@ export async function buildDirectoryRegistry(config: DirectoryRegistryConfig): P
   const identities = await Promise.all(config.identities.map(buildDirectory))
   const claimedSlugs = new Map<string, string>()
   for (const identity of identities) {
-    for (const slug of [identity.owner.handle, ...identity.owner.aliases]) {
+    const identityHandle = identity.owner.handle
+    for (const slug of [identityHandle, ...identity.owner.aliases]) {
       const owner = claimedSlugs.get(slug)
       if (owner) {
-        throw new InvalidKeySourceError(`Route alias ${slug} is claimed by both ${owner} and ${identity.owner.handle}.`)
+        throw new InvalidKeySourceError(`Route alias ${slug} is claimed by both ${owner} and ${identityHandle}.`)
       }
-      claimedSlugs.set(slug, identity.owner.handle)
+      claimedSlugs.set(slug, identityHandle)
     }
   }
 
