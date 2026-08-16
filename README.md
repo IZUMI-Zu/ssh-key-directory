@@ -1,6 +1,17 @@
 # SSH Key Directory
 
+[English](./README.md) | [简体中文](./README.zh-CN.md)
+
 A config-as-code SSH public key directory for Cloudflare Workers. It provides GitHub-style `.keys` endpoints, identity groups, aliases, JSON metadata, fingerprints, and a responsive inspection UI without a database.
+
+## Contents
+
+- [Configure identities and keys](#configure-identities-and-keys)
+- [Groups](#groups)
+- [Key type aliases](#key-type-aliases)
+- [Local development](#local-development)
+- [Deployment](#deployment)
+- [Open-source maintenance](#open-source-maintenance)
 
 ## Configure identities and keys
 
