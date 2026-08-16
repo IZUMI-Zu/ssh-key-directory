@@ -1,13 +1,26 @@
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 
-const [app, uno, css, html, favicon] = await Promise.all([
+async function readComponentSources() {
+  const directory = new URL('../src/components/', import.meta.url)
+  const entries = await readdir(directory, { withFileTypes: true })
+  const componentFiles = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.tsx'))
+    .sort((left, right) => left.name.localeCompare(right.name))
+
+  assert.ok(componentFiles.length >= 8, 'Page sections should remain split into focused component modules')
+  return Promise.all(componentFiles.map((entry) => readFile(new URL(entry.name, directory), 'utf8')))
+}
+
+const [appShell, componentSources, uno, css, html, favicon] = await Promise.all([
   readFile(new URL('../src/App.tsx', import.meta.url), 'utf8'),
+  readComponentSources(),
   readFile(new URL('../uno.config.ts', import.meta.url), 'utf8'),
   readFile(new URL('../src/index.css', import.meta.url), 'utf8'),
   readFile(new URL('../index.html', import.meta.url), 'utf8'),
   readFile(new URL('../public/favicon.svg', import.meta.url), 'utf8'),
 ])
+const app = [appShell, ...componentSources].join('\n')
 
 function shortcut(name) {
   const match = uno.match(new RegExp(`'${name}':\\s*'([^']+)'`))
@@ -38,6 +51,9 @@ assert.match(shortcut('status-badge'), /\bleading-none\b/, 'Badge text must not 
 assert.match(shortcut('status-badge'), /\bpt-px\b/, 'Mono badge text needs a one-pixel optical correction')
 assert.match(shortcut('btn-action'), /\bmin-h-10\b/, 'Action buttons need a 40px minimum height')
 assert.match(shortcut('btn-icon'), /\bsize-10\b/, 'Icon buttons need a 40px hit area')
+assert.doesNotMatch(appShell, /<section\b/, 'App must orchestrate focused section components instead of owning page markup')
+assert.match(appShell, /\.\/components\/IdentitiesSection\.tsx/, 'App must compose the identity section module')
+assert.match(appShell, /\.\/components\/GroupsSection\.tsx/, 'App must compose the Groups section module')
 assert.match(app, /\bz-top-nav\b/, 'The sticky header must use a named z-index layer')
 assert.match(app, /keyType\.aliases\?\.join/, 'The UI must tolerate cached API responses without type aliases')
 assert.match(app, /directory\?schema=3/, 'The UI must version its cached directory API contract')
