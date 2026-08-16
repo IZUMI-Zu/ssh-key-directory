@@ -11,7 +11,7 @@ export function SiteHeader({
     <header className="sticky top-0 z-top-nav border-b border-base bg-nav backdrop-blur-xl">
       <div className="page-shell flex h-14 items-center gap-3">
         <a className="flex min-w-0 items-center gap-2.5 color-base no-underline" href="/">
-          <img className="size-8 shrink-0" src="/favicon.svg?v=20260816" alt="" aria-hidden="true" />
+          <img className="size-10 shrink-0" src="/favicon.svg?v=2026081602" alt="" aria-hidden="true" />
           <span className="truncate font-mono text-xs font-500" title={host}>
             {host}
           </span>
